@@ -23,8 +23,10 @@ def get_labels_fromDF(df_values: pd.DataFrame):
 
 
 def get_annotations(annotation_path: str, file_path: str):
-    anno_json = json.load(open(os.path.join(annotation_path, file_path)))
-
+    annotations_json = json.load(open(os.path.join(annotation_path, file_path)))
+    return annotations_json
+    
+def get_annotation_information(anno_json):
     # Extract Name from annotation:
     fileName = (pd.json_normalize(data=anno_json)['file_upload'][0]).split('-')[-1]
 
@@ -56,21 +58,29 @@ def create_LabelStudioDataset(root_anno_path, annotation_files):
 
     annotationNumber = 1
 
+    # ToDo: make a new function that gets all annotations from all json files, and then
+    # we can use a simple for loop to get create cocoDataset
+
     for file_path in annotation_files:
-        fileId, fileName, width, height, keypoints = get_annotations(root_anno_path, file_path)
+        
+        annotations = get_annotations(root_anno_path, file_path)
 
-        cocoImage = ImageCOCO(image_id=fileId, width=width, height=height,
-                              file_name=fileName, license_id=coco_ds.getLicense().getId())
+        for json_anno in annotations:
 
-        coco_ds.addImage(cocoImage)
+            fileId, fileName, width, height, keypoints = get_annotation_information(json_anno)
 
-        # Create annotation for image
-        annotation = Annotation(annotation_id=annotationNumber, image_id=cocoImage.getId(),
-                                category_id=1, keypoints=[coordinate for row in keypoints for coordinate in row],
-                                num_keypoints=keypoints.shape[0])
+            cocoImage = ImageCOCO(image_id=fileId, width=width, height=height,
+                                file_name=fileName, license_id=coco_ds.getLicense()[0].getId())
 
-        coco_ds.addAnnotation(annotation)
+            coco_ds.addImage(cocoImage)
 
-        annotationNumber += 1
+            # Create annotation for image
+            annotation = Annotation(annotation_id=annotationNumber, image_id=cocoImage.getId(),
+                                    category_id=1, keypoints=[coordinate for row in keypoints for coordinate in row],
+                                    num_keypoints=keypoints.shape[0])
+
+            coco_ds.addAnnotation(annotation)
+
+            annotationNumber += 1
 
     return coco_ds
