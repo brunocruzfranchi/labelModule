@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from traceback import print_tb
 
 
 class COCO:
@@ -28,7 +29,7 @@ class COCO:
         self._categories.append(categories)
 
     def getLicense(self):
-        return self._licenses[0]
+        return self._licenses
 
     def toJson(self):
         annotations = []
@@ -38,19 +39,19 @@ class COCO:
 
         # Convert images to JSON
         for image in self._images:
-            images.append(image.toJson)
+            images.append(image.toJson())
 
         # Convert licenses to Json
         for license in self._licenses:
-            licenses.append(license.toJson)
+            licenses.append(license.toJson())
 
         # Convert annotations
         for annotation in self._annotations:
-            annotations.append(annotation.toJson)
+            annotations.append(annotation.toJson())
 
         # Convert categories
         for category in self._categories:
-            categories.append(category.toJson)
+            categories.append(category.toJson())
 
         return {
             'info': self._info.toJson(),

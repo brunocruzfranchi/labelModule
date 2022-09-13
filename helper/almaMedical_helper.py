@@ -5,13 +5,15 @@ from typing import List, Union
 import numpy as np
 from pydicom import dcmread
 from collections import OrderedDict
+from src.data.coco_class import *
 
 
 # Funcion para obtener la direccion de las anotaciones DICOM
 # Dicom ref: https://dicom.nema.org/medical/dicom/current/output/chtml/part05/sect_6.2.html
-def getDicomPathFiles(root_path: str) -> list[Union[bytes, str]]:
+def getDicomPathFiles(root_path: str):
     dicom_files = []
     for (dirpath, dirnames, filenames) in walk(root_path):
+        filenames = [ fi for fi in filenames if not fi.endswith(('.jpg', '.json'))]
         if filenames:
             for filename in filenames:
                 dicom_files.append(os.path.join(dirpath, filename).replace('\\', '/'))
@@ -51,7 +53,7 @@ def findDicomImage(path_annotation_dicom, files_path: list):
         if images_tags['ClassUID'] == referencedTags['ReferencedClassUID'] and images_tags['InstanceUID'] == \
                 referencedTags['ReferencedInstanceUID']:
             image_dicom = file
-    return image_dicom
+    return image_dicom.split('/')[-1]
 
 
 # Funcion para obtener todos los AnchorPoints de los Diametros
@@ -127,3 +129,37 @@ def getAnnotations(annotation_dicom, dicom_files):
     keypoints: np.ndarray = get_keypoints_fromDict(keypoints)
 
     return int(fileID), fileName, int(width), int(height), keypoints
+
+
+def create_AlmaMedicalDataset(dicom_files):
+    coco_ds = COCO(set_HIBA=True)
+    coco_ds.setInfo(Info(version="1.0.0", description="Spinogram_Dataset"))
+    coco_ds.addCategories(Categories(category_id=1, name='spine', supercategory='spine',
+                                     keypoints=['C2OT', 'C1AE', 'C1PE', 'C2CE', 'C2AI', 'C2PI', 'C7AS', 'C7PS', 'C7CE',
+                                                'C7AI', 'C7PI', 'T1AS', 'T1PS', 'T1CE', 'T1AI', 'T1PI', 'T5AS', 'T5PS',
+                                                'T12A', 'T12P', 'L1AS', 'L1PS', 'L4AS', 'L4PS', 'L4AI', 'L4PI', 'S1AS',
+                                                'S1MI', 'S1PS', 'F1HC', 'F2HC'],
+                                     skeleton=[]))
+
+    annotationNumber = 1
+
+    annotation_dicoms = getAnnotationDicoms(dicom_files)
+
+    for annotation_dicom in annotation_dicoms:
+
+        fileId, fileName, width, height, keypoints = getAnnotations(annotation_dicom, dicom_files)
+
+        cocoImage = ImageCOCO(image_id=fileId, width=width, height=height,
+                              file_name=fileName, license_id=coco_ds.getLicense()[0].getId())
+        coco_ds.addImage(cocoImage)
+
+        # Create annotation for image
+        annotation = Annotation(annotation_id=annotationNumber, image_id=cocoImage.getId(),
+                                category_id=1, keypoints=[coordinate for row in keypoints for coordinate in row],
+                                num_keypoints=keypoints.shape[0])
+
+        coco_ds.addAnnotation(annotation)
+
+        annotationNumber += 1
+
+    return coco_ds

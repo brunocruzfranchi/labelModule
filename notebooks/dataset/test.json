@@ -1,0 +1,80 @@
+{
+    "info": {
+        "year": 2022,
+        "version": "1.0.0",
+        "description": "Spinogram_Dataset",
+        "contributor": "",
+        "url": "",
+        "date_created": "2022-09-06"
+    },
+    "licenses": [
+        {
+            "id": 1,
+            "name": "Hospital Italiano",
+            "url": "https://www.hospitalitaliano.org.ar"
+        }
+    ],
+    "images": [
+        {
+            "id": 17409538,
+            "width": 3018,
+            "height": 7048,
+            "file_name": "./notebooks/dataset/FILESET/1036487/0/3/3",
+            "license": 1,
+            "flickr_url": "",
+            "coco_url": "",
+            "date_captured": "2022-09-06"
+        }
+    ],
+    "annotations": [
+        {
+            "id": 1,
+            "image_id": 17409538,
+            "category_id": 1,
+            "iscrowd": 0,
+            "keypoints": [],
+            "num_keypoints": 0
+        }
+    ],
+    "categories": [
+        {
+            "id": 1,
+            "name": "spine",
+            "supercategory": "spine",
+            "keypoints": [
+                "C2OT",
+                "C1AE",
+                "C1PE",
+                "C2CE",
+                "C2AI",
+                "C2PI",
+                "C7AS",
+                "C7PS",
+                "C7CE",
+                "C7AI",
+                "C7PI",
+                "T1AS",
+                "T1PS",
+                "T1CE",
+                "T1AI",
+                "T1PI",
+                "T5AS",
+                "T5PS",
+                "T12A",
+                "T12P",
+                "L1AS",
+                "L1PS",
+                "L4AS",
+                "L4PS",
+                "L4AI",
+                "L4PI",
+                "S1AS",
+                "S1MI",
+                "S1PS",
+                "F1HC",
+                "F2HC"
+            ],
+            "skeleton": []
+        }
+    ]
+}
