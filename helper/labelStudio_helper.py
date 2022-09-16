@@ -52,7 +52,7 @@ def create_LabelStudioDataset(root_anno_path, annotation_files):
     coco_ds.addCategories(Categories(category_id=1, name='spine', supercategory='spine',
                                      keypoints=['C2OT', 'C1AE', 'C1PE', 'C2CE', 'C2AI', 'C2PI', 'C7AS', 'C7PS', 'C7CE',
                                                 'C7AI', 'C7PI', 'T1AS', 'T1PS', 'T1CE', 'T1AI', 'T1PI', 'T5AS', 'T5PS',
-                                                'T12A', 'T12P', 'L1AS', 'L1PS', 'L4AS', 'L4PS', 'L4AI', 'L4PI', 'S1AS',
+                                                'T12AI', 'T12PI', 'L1AS', 'L1PS', 'L4AS', 'L4PS', 'L4AI', 'L4PI', 'S1AS',
                                                 'S1MI', 'S1PS', 'F1HC', 'F2HC'],
                                      skeleton=[]))
 

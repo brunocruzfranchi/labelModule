@@ -53,7 +53,7 @@ def findDicomImage(path_annotation_dicom, files_path: list):
         if images_tags['ClassUID'] == referencedTags['ReferencedClassUID'] and images_tags['InstanceUID'] == \
                 referencedTags['ReferencedInstanceUID']:
             image_dicom = file
-    return image_dicom.split('/')[-1]
+    return image_dicom
 
 
 # Funcion para obtener todos los AnchorPoints de los Diametros
@@ -61,8 +61,8 @@ def findAnchorPoints(path_annotation_dicom):
     keypoints = {}
 
     key_order = ["C2OT", "C1AE", "C1PE", "C2CE", "C2AI", "C2PI", "C7AS", "C7PS", "C7CE",
-                 "C7AI", "C7PI", "T1AS", "T1PS", "T1CE", "T1AI", "T1PI", "T5AS", "T5PS", "T12A", "T12P",
-                 "L1AS", "L1PS", "L4AS", "L4PS", "L4AI", "L4PI", "S1AS", "S1MI", "S1PS", "F1HC", "F2HC"]
+                 "C7AI", "C7PI", "T1AS", "T1PS", "T1CE", "T1AI", "T1PI", "T5AS", "T5PS", "T12AI", "T12PI",
+                 "L1AS", "L1PS", "L4AS", "L4PS", "L4AI", "L4PI", "S1AS", "S1MI", "S1PS", "F1HC", "F2HC", "FHCE"]
 
     label_diameter = 'AlmaLayerANN_DIAMETER'
 
@@ -116,7 +116,7 @@ def getAnnotations(annotation_dicom, dicom_files):
     dicom_image = dcmread(path_dicom_image)
 
     # Extract Name from annotation:
-    fileName = path_dicom_image
+    fileName = path_dicom_image.split('/')[-1]
 
     # Extract ID (Accession Number) from annotation:
     fileID = dicom_image[0x0008, 0x0050].value
@@ -137,7 +137,7 @@ def create_AlmaMedicalDataset(dicom_files):
     coco_ds.addCategories(Categories(category_id=1, name='spine', supercategory='spine',
                                      keypoints=['C2OT', 'C1AE', 'C1PE', 'C2CE', 'C2AI', 'C2PI', 'C7AS', 'C7PS', 'C7CE',
                                                 'C7AI', 'C7PI', 'T1AS', 'T1PS', 'T1CE', 'T1AI', 'T1PI', 'T5AS', 'T5PS',
-                                                'T12A', 'T12P', 'L1AS', 'L1PS', 'L4AS', 'L4PS', 'L4AI', 'L4PI', 'S1AS',
+                                                'T12AI', 'T12PI', 'L1AS', 'L1PS', 'L4AS', 'L4PS', 'L4AI', 'L4PI', 'S1AS',
                                                 'S1MI', 'S1PS', 'F1HC', 'F2HC'],
                                      skeleton=[]))
 
