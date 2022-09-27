@@ -1,4 +1,5 @@
 import os
+from turtle import width
 import numpy as np
 import pandas as pd
 from src.data.coco_class import *
@@ -26,6 +27,7 @@ def get_annotations(annotation_path: str, file_path: str):
     annotations_json = json.load(open(os.path.join(annotation_path, file_path)))
     return annotations_json
     
+
 def get_annotation_information(anno_json):
     # Extract Name from annotation:
     fileName = (pd.json_normalize(data=anno_json)['file_upload'][0]).split('-')[-1]
@@ -78,6 +80,68 @@ def create_LabelStudioDataset(root_anno_path, annotation_files):
             annotation = Annotation(annotation_id=annotationNumber, image_id=cocoImage.getId(),
                                     category_id=1, keypoints=[coordinate for row in keypoints for coordinate in row],
                                     num_keypoints=keypoints.shape[0])
+
+            coco_ds.addAnnotation(annotation)
+
+            annotationNumber += 1
+
+    return coco_ds
+
+
+def get_annotation_information_categories(anno_json):
+    # Extract Name from annotation:
+    fileName = (pd.json_normalize(data=anno_json)['file_upload'][0]).split('-')[-1]
+
+    # Extract ID (Accession Number) from annotation:
+    fileID = pd.json_normalize(data=anno_json)['id'][0]
+
+    # Dataframe Values
+    df_values = pd.json_normalize(data=anno_json, record_path=['annotations', ['result']])
+
+    width = 229
+    height = 229
+
+    return int(fileID), fileName, width, height, df_values['value.choices'][0][0]
+
+
+def cancelled_annotations(anno_json):
+    # Extract Name from annotation:
+    cancelled = pd.json_normalize(data=anno_json)['cancelled_annotations'][0]
+    return bool(cancelled)
+
+
+def create_OrientationDataset(root_anno_path, annotation_files, categories):
+    coco_ds = COCO(set_HIBA=True)
+    coco_ds.setInfo(Info(version="1.0.0", description="Spinogram_Dataset"))
+
+    dict_categories = {}
+
+    for category in categories:
+        dict_categories[category['category']] = category['id']
+        coco_ds.addCategories(Categories(id=category['id'], name=category['category'], supercategory=category['supercategory']))
+
+    annotationNumber = 1
+
+    # ToDo: make a new function that gets all annotations from all json files, and then
+    # we can use a simple for loop to get create cocoDataset
+
+    for file_path in annotation_files:
+        
+        annotations = get_annotations(root_anno_path, file_path)
+
+        for json_anno in annotations:
+            
+            if cancelled_annotations(json_anno):
+                continue
+
+            fileId, fileName, width, height, choice = get_annotation_information_categories(json_anno)
+
+            cocoImage = ImageCOCO(image_id=fileId, width=width, height=height, file_name=fileName, license_id=coco_ds.getLicense()[0].getId())
+
+            coco_ds.addImage(cocoImage)
+
+            # Create annotation for image
+            annotation = Annotation(annotation_id=annotationNumber, image_id=cocoImage.getId(), category_id = dict_categories[choice])
 
             coco_ds.addAnnotation(annotation)
 

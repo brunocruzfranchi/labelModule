@@ -108,26 +108,24 @@ class License:
 
 # categories[{ "id": int, "name": str, "supercategory": str, "keypoints": [str], "skeleton": [edge],}]
 class Categories:
-    def __init__(self, category_id: int, name: str, supercategory: str, keypoints, skeleton):
-        self.category_id = category_id
+    def __init__(self, id: int, name: str, supercategory: str, keypoints = None, skeleton = None):
+        self.id = id
         self.name = name
         self.supercategory = supercategory
         self.keypoints = keypoints
         self.skeleton = skeleton
 
-    def toJson(self):
-        return {
-            'id': self.category_id,
-            'name': self.name,
-            'supercategory': self.supercategory,
-            'keypoints': self.keypoints,
-            'skeleton': self.skeleton
-        }
+    def toJson(self) -> dict:
+        json_dict = {}
+        for var in self.__dict__:
+            if getattr(self, var) is not None:
+                json_dict[var] = getattr(self, var)
+        return json_dict
 
 
 # image{ "id": int, "width": int, "height": int, "file_name": str, "license": int, "flickr_url": str, "coco_url": str, "date_captured": datetime, }
 class ImageCOCO:
-    def __init__(self, image_id: int, width: int, height: int, file_name: str, license_id: int,
+    def __init__(self, image_id: int, width: int = None, height: int = None, file_name: str = None, license_id: int = None,
                  date_captured=None, flick_url: str = '', coco_url: str = ''):
         self.id = image_id
         self.width = width
@@ -144,16 +142,11 @@ class ImageCOCO:
         return self.id
 
     def toJson(self) -> dict:
-        return {
-            'id': self.id,
-            'width': self.width,
-            'height': self.height,
-            'file_name': self.file_name,
-            'license': self.license,
-            'flickr_url': self.flickr_url,
-            'coco_url': self.coco_url,
-            'date_captured': self.date_captured
-        }
+        json_dict = {}
+        for var in self.__dict__:
+            if getattr(self, var) is not None:
+                json_dict[var] = getattr(self, var)
+        return json_dict
 
 
 class Annotation:
